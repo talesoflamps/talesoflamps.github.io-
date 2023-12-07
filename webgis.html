@@ -2,325 +2,289 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University of Aberdeen administration Website</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- leaflet css  -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <title>Leaflet JS</title>
 
+  <link rel="icon" href="leaflet.png" type="image/icon type">
 
+  <!-- Links to CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-measure@3.1.0/dist/leaflet-measure.min.css">
+
+  <!-- Styles -->
     <style>
-        header {
-            height: 3vh;
-            background-color: #111d2f;
-            color: white;
-            font-family: Arial, Helvetica, sans-serif;
-            padding: 1vh;
-            font-size: 24px;
-            position: relative;
+      header {
+        height: 3vh;
+        background-color: #111d2f;
+        color: white;
+        font-family: Arial, Helvetica, sans-serif;
+        padding: 1vh;
+        font-size: 24px;
+        position: relative;
+      }
+      .popup-title {
+        font-size: 18px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+      }
+      .popup-text {
+        font-size: 14px;
+      }
+      header p {
+        margin: 0;
+        padding: 0;
+      }
+      @media screen and (max-width: 1120px) {
+        header i{
+          display: none
         }
-
-        .popup-title {
-          font-size: 18px;
-          font-family: Arial, Helvetica, sans-serif;
-          font-weight: bold;
+        header #bigsc {
+          display: none;
         }
-
-        .popup-text {
-          font-size: 14px;
+      }
+      @media screen and (min-width: 1120px){
+        header #smallsc {
+          display: none;
         }
-
-        header p {
-          margin: 0;
-          padding: 0;
-        }
-
-        @media screen and (max-width: 1120px) {
-          header i{
-            display: none
-          }
-          header #bigsc {
-            display: none;
-          }
-        }
-
-        @media screen and (min-width: 1120px){
-          header #smallsc {
-            display: none;
-          }
-        }
-
-
-        header i.anotation {
-            font-size: 16px;
-            position: absolute;
-            top: 2px;
-            right: 2px;
-        }
-
-        i.anotation a:link {
-            color: goldenrod;
-        }
-
-        i.anotation a:visited {
-            color: gold;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        i.anotation a:hover {
-            color: aqua;
-        }
-
-        #map {
-            width: 100%;
-            height: 95vh;
-        }
-
-        .custom-building-tooltip {
-            background: none;
-            border: none;
-            border-color: transparent;
-            color: black;
-            box-shadow: none;
-        }
-
-        .leaflet-control-custom {
-            font-size: x-large;
-            background-color: aqua;
-            padding: 10px;
-            opacity: 0.7;
-        }
-
-        .info.legend {
-            font-size: 24px;
-            background: #c0c7cd;
-            border: 2px solid black;
-            padding: 10px;
-            text-align: left;
-            margin-left: 6px;
-            display: inline;
-            opacity: 0.5;
-            border-radius: 5px;
-            transition: opacity 0.5s ease;
-        }
-
-        .info.legend:hover {
-            opacity: 1.0;
-        }
-
-        .info.legend i {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-            display: inline-block;
-        }
-
-        .info.legend i.cycle-lane {
-            background: red;
-            width: 8px;
-            height: 30px;
-            border: none;
-        }
-
-        .info.legend i.building {
-            background: #404a59;
-            opacity: 1;
-            border: 3px solid #33000c;
-        }
-
-        .info.legend i.roads {
-            background: #fdfcc5;
-            width: 8px;
-            height: 30px;
-            border: none;
-        }
-        .info.legend i.Wheelchair {
-            background: #187dbf;
-            width: 8px;
-            height: 30px;
-            border: none;
-            margin-left: 16px;
-        }
-
-        span {
-            font-style: italic;
-            font-size: 20px;
-
-        }
-
-
-        .container:hover {
-            background-color: #c0c7cd;
-            font-size: 24px;
-            color: black;
-            opacity: 0.5;
-            padding: 5px;
-            border-radius: 5px;
-            width: 200px; /* Set the width to make it bigger */
-            opacity: 1.0;
-        }
-
-        .leaflet-control-button-bike {
-            background-color: greenyellow;
-            border: 1px solid #ccc;
-            padding: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease; /* Background color transition */
-            border-radius: 15px;
-        }
-
-        .leaflet-control-button-bike:hover {
-            background-color: white;
-        }
-
-        .leaflet-control-button-bike.off {
-            color: black; /* Adjust the button width */
-            background-color: white;
-            opacity: 0.7;
-        }
-
-        .leaflet-control-button-bike.off:hover {
-            background-color: greenyellow;
-        }
-
-        .leaflet-control-button-build {
-            background-color: greenyellow;
-            border: 1px solid #ccc;
-            padding: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease; /* Background color transition */
-            border-radius: 15px;
-        }
-
-        .leaflet-control-button-build:hover {
-            background-color: white;
-        }
-
-        .leaflet-control-button-build.off {
-            color: black; /* Adjust the button width */
-            background-color: white;
-            opacity: 0.7;
-        }
-
-        .leaflet-control-button-build.off:hover {
-            background-color: greenyellow;
-        }
-
-        .leaflet-control-button-cycle {
-            background-color: greenyellow;
-            border: 1px solid #ccc;
-            padding: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease; /* Background color transition */
-            border-radius: 15px;
-        }
-
-        .leaflet-control-button-cycle:hover {
-            background-color: white;
-        }
-
-        .leaflet-control-button-cycle.off {
-            color: black; /* Adjust the button width */
-            background-color: white;
-            opacity: 0.7;
-        }
-
-        .leaflet-control-button-cycle.off:hover {
-            background-color: greenyellow;
-        }
-
-        .leaflet-control-button-roads {
-            background-color: greenyellow;
-            border: 1px solid #ccc;
-            padding: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease; /* Background color transition */
-            border-radius: 15px;
-        }
-
-        .leaflet-control-button-roads:hover {
-            background-color: white;
-        }
-
-        .leaflet-control-button-roads.off {
-            color: black; /* Adjust the button width */
-            background-color: white;
-            opacity: 0.7;
-        }
-
-        .leaflet-control-button-road.off:hover {
-            background-color: greenyellow;
-        }
-        .leaflet-control-button-wheelchair {
-            background-color: greenyellow;
-            border: 1px solid #ccc;
-            padding: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease; /* Background color transition */
-            border-radius: 15px;
-        }
-
-        .leaflet-control-button-wheelchair:hover {
-            background-color: white;
-        }
-
-        .leaflet-control-button-wheelchair.off {
-            color: black; /* Adjust the button width */
-            background-color: white;
-            opacity: 0.7;
-        }
-
-        .leaflet-control-button-wheelchair.off:hover {
-            background-color: greenyellow;
-        }
-
-        .leaflet-control-geocoder {
-            background-color: #c0c7cd;
-            border: 1px solid ;
-            border-radius: 10px;
-        }
-        .leaflet-control-geocoder-icon {
-          background-color: #c0c7cd;
-        }
-
-        a.leaflet-control-zoom-in, a.leaflet-control-zoom-out { background-color: #c0c7cd; }
-        .leaflet-bar.leaflet-control-locate a {
-        background-color: #c0c7cd; /* Change this to your desired background color */
-        }
-
-        .fullscreen-button {
-          background-image: url(fs.png);
-          background-size: contain;
-          background-repeat: no-repeat;
-          width: 40px;
-          height: 40px;
-          background-color: #c0c7cd;
-          border-radius: 5px;
-          border: none;
-          opacity: 0.9;
-        }
-
-        .fullscreen-button:hover {
-          background-color: white;
-        }
-
-        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-          background-color: #111d2f;
-          color:#c0c7cd;
-        }
-        
-        p.help {
-          font-size: 14px;
-        }
-
-    </style>
+      }
+      header i.anotation {
+        font-size: 16px;
+        position: absolute;
+        top: 2px;
+        right: 2px;
+      }
+      i.anotation a:link {
+        color: goldenrod;
+      }
+      i.anotation a:visited {
+        color: gold;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      i.anotation a:hover {
+          color: aqua;
+      }
+      #map {
+        width: 100%;
+        height: 95vh;
+      }
+      .custom-building-tooltip {
+        background: none;
+        border: none;
+        border-color: transparent;
+        color: black;
+        box-shadow: none;
+      }
+      .leaflet-control-custom {
+        font-size: x-large;
+        background-color: aqua;
+        padding: 10px;
+        opacity: 0.7;
+      }
+      .info.legend {
+        font-size: 24px;
+        background: #c0c7cd;
+        border: 2px solid black;
+        padding: 10px;
+        text-align: left;
+        margin-left: 6px;
+        display: inline;
+        opacity: 0.5;
+        border-radius: 5px;
+        transition: opacity 0.5s ease;
+      }
+      .info.legend:hover {
+        opacity: 1.0;
+      }
+      .info.legend i {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        display: inline-block;
+      }
+      .info.legend i.cycle-lane {
+        background: red;
+        width: 8px;
+        height: 30px;
+        border: none;
+      }
+      .info.legend i.building {
+        background: #404a59;
+        opacity: 1;
+        border: 3px solid #33000c;
+      }
+      .info.legend i.roads {
+        background: #fdfcc5;
+        width: 8px;
+        height: 30px;
+        border: none;
+      }
+      .info.legend i.Wheelchair {
+        background: #187dbf;
+        width: 8px;
+        height: 30px;
+        border: none;
+        margin-left: 16px;
+      }
+      span {
+        font-style: italic;
+        font-size: 20px;
+      }
+      .container:hover {
+        background-color: #c0c7cd;
+        font-size: 24px;
+        color: black;
+        opacity: 0.5;
+        padding: 5px;
+        border-radius: 5px;
+        width: 200px; 
+        opacity: 1.0;
+      }
+      .leaflet-control-button-bike {
+        background-color: greenyellow;
+        border: 1px solid #ccc;
+        padding: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease; 
+        border-radius: 15px;
+      }
+      .leaflet-control-button-bike:hover {
+        background-color: white;
+      }
+      .leaflet-control-button-bike.off {
+        color: black; 
+        background-color: white;
+        opacity: 0.7;
+      }
+      .leaflet-control-button-bike.off:hover {
+        background-color: greenyellow;
+      }
+      .leaflet-control-button-build {
+        background-color: greenyellow;
+        border: 1px solid #ccc;
+        padding: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease; 
+        border-radius: 15px;
+      }
+      .leaflet-control-button-build:hover {
+        background-color: white;
+      }
+      .leaflet-control-button-build.off {
+        color: black; 
+        background-color: white;
+        opacity: 0.7;
+      }
+      .leaflet-control-button-build.off:hover {
+        background-color: greenyellow;
+      }
+      .leaflet-control-button-cycle {
+        background-color: greenyellow;
+        border: 1px solid #ccc;
+        padding: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease; 
+        border-radius: 15px;
+      }
+      .leaflet-control-button-cycle:hover {
+        background-color: white;
+      }
+      .leaflet-control-button-cycle.off {
+        color: black; 
+        background-color: white;
+        opacity: 0.7;
+      }
+      .leaflet-control-button-cycle.off:hover {
+        background-color: greenyellow;
+      }
+      .leaflet-control-button-roads {
+        background-color: greenyellow;
+        border: 1px solid #ccc;
+        padding: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease; 
+        border-radius: 15px;
+      }
+      .leaflet-control-button-roads:hover {
+        background-color: white;
+      }
+      .leaflet-control-button-roads.off {
+        color: black; 
+        background-color: white;
+        opacity: 0.7;
+      }
+      .leaflet-control-button-road.off:hover {
+        background-color: greenyellow;
+      }
+      .leaflet-control-button-wheelchair {
+        background-color: greenyellow;
+        border: 1px solid #ccc;
+        padding: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease; 
+        border-radius: 15px;
+      }
+      .leaflet-control-button-wheelchair:hover {
+        background-color: white;
+      }
+      .leaflet-control-button-wheelchair.off {
+        color: black; 
+        background-color: white;
+        opacity: 0.7;
+      }
+      .leaflet-control-button-wheelchair.off:hover {
+        background-color: greenyellow;
+      }
+      .leaflet-control-geocoder {
+        background-color: #c0c7cd;
+        border: 1px solid ;
+        border-radius: 10px;
+      }
+      .leaflet-control-geocoder-icon {
+        background-color: #c0c7cd;
+      }
+      a.leaflet-control-zoom-in, a.leaflet-control-zoom-out { 
+        background-color: #c0c7cd; 
+      }
+      .leaflet-bar.leaflet-control-locate a {
+        background-color: #c0c7cd; 
+      }
+      .fullscreen-button {
+        background-image: url(fs.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 40px;
+        height: 40px;
+        background-color: #c0c7cd;
+        border-radius: 5px;
+        border: none;
+        opacity: 0.9;
+      }
+      .fullscreen-button:hover {
+        background-color: white;
+      }
+      .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background-color: #111d2f;
+        color:#c0c7cd;
+      }
+      p.help {
+        font-size: 14px;
+      }
+      .leaflet-control-measure {
+        background-color: #c0c7cd;
+      .leaflet-control-measure-toggle,
+      .leaflet-control-measure-toggle:hover {
+        background-color:#c0c7cd;
+      }}
+  </style>
 </head>
+<!-- HTML PAGE -->
 <header>
   <p id="bigsc">University of Aberdeen administration Website</p> 
   <i class="anotation"> 
@@ -333,64 +297,71 @@
   </i>
   <p id="smallsc">UoA Admin</p>
 </header>
+
 <body>
     <div id="map"></div>
 </body>
 
 </html>
 
-<!-- leaflet js  -->
+<!-- leaflet js and add-ons  -->
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@[VERSION]/dist/L.Control.Locate.min.js" charset="utf-8"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-measure@3.1.0/dist/leaflet-measure.min.js"></script>
+<!-- Link to data -->
 <script src="Data/bikepark.js"></script>
 <script src="Data/buildadmin.js"></script>
 <script src="Data/cyclelane.js"></script>
 <script src="Data/roads.js"></script>
 <script src="Data/accesible.js"></script>
+
+<!-- Java Script -->
 <script>
-    // Map initialization 
-    var map = L.map('map').setView([57.166, -2.1025], 16);
+  // Map initialization 
+  var map = L.map('map').setView([57.166, -2.1025], 16);
 
-    //google satellite
-    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-        maxZoom: 22,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        opacity: 0.6
-    });
-    googleSat.addTo(map);
+  //google satellite
+  var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      maxZoom: 22,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      opacity: 0.6
+  });
+  googleSat.addTo(map);
 
-    L.control.locate().addTo(map);
-    var geocoderControl = L.Control.geocoder({
+  //Search Tool
+  L.control.locate().addTo(map);
+  var geocoderControl = L.Control.geocoder({
     defaultMarkGeocode: false,
-    zoomLevel: 20, // Set the desired zoom level
-    collapsed: true, // Open the geocoder control by default
-    placeholder: 'Search for a location...', // Placeholder text in the search box
-}).on('markgeocode', function (e) {
+    zoomLevel: 20, 
+    collapsed: true, 
+    placeholder: 'Search for a location...', 
+  }).on('markgeocode', function (e) {
     map.setView(e.geocode.center, geocoderControl.options.zoomLevel);
-}).addTo(map);
+  }).addTo(map);
 
-    // GeoJSON layers
-    // Bike Pak Layer
-    var bikeLayer = L.geoJSON(bikeJSON, {
-    pointToLayer: function(feature, latlng) {
-        return L.marker(latlng, { icon: L.icon({
-            iconUrl: "park.png",
-            iconSize: [50, 50], // Adjust the size as needed
-            iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
-            })
-        });
-    }
-    }).addTo(map);
+  //Measure tool
+  L.control.measure().addTo(map)
 
-    var buttonControl = L.Control.extend({
+  //Bike Layer
+  var bikeLayer = L.geoJSON(bikeJSON, {
+  pointToLayer: function(feature, latlng) {
+    return L.marker(latlng, { icon: L.icon({
+        iconUrl: "park.png",
+        iconSize: [50, 50],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+        })
+    });
+  }
+  }).addTo(map);
+  // Bike Layer Button
+  var buttonControl = L.Control.extend({
     options: {
-      position: 'topleft' // Adjust the position as needed
+      position: 'topleft' 
     },
-
     onAdd: function (map) {
       var button = L.DomUtil.create('button', 'leaflet-control-button-bike');
       button.innerHTML = 'Bike Parks';
@@ -398,9 +369,7 @@
       return button;
     }
   });
-
   map.addControl(new buttonControl());
-
   function toggleBike() {
     if (map.hasLayer(bikeLayer)) {
       map.removeLayer(bikeLayer);
@@ -411,36 +380,35 @@
     }
   }
 
-    // Building Layer
-    var buildLayer = L.geoJSON(buildJSON, {
-        onEachFeature: function (feature, layer) {
-            var popupContent = '<p class="popup-title">' + feature.properties.Name; + '</p>'
+  // Building Layer
+  var buildLayer = L.geoJSON(buildJSON, {
+    onEachFeature: function (feature, layer) {
+      var popupContent = '<p class="popup-title">' + feature.properties.Name; + '</p>'
 
-            if (feature.properties.Sites && feature.properties.Sites.trim() !== '') {
-                popupContent += '<p class="popup-text"><b>Sites:</b> ' + feature.properties.Sites;
-            }
+      if (feature.properties.Sites && feature.properties.Sites.trim() !== '') {
+        popupContent += '<p class="popup-text"><b>Sites:</b> ' + feature.properties.Sites;
+      }
 
-            if (feature.properties.Occupancy !== 0) {
-                popupContent += '<br><b>Library Ocupancy: </b>' + feature.properties.Occupancy + '%';
-            }
+      if (feature.properties.Occupancy !== 0) {
+        popupContent += '<br><b>Library Ocupancy: </b>' + feature.properties.Occupancy + '%';
+      }
 
-            layer.bindPopup(popupContent, {
-              closeButton: false,
-            });
-        },
-        style: {
-            fillColor: '#111d2f',
-            fillOpacity: 0.7,
-            color: '#33000c',
-            weight: 1,
-        }
-    }).addTo(map);
-
-    var buttonControl = L.Control.extend({
-    options: {
-      position: 'topleft' // Adjust the position as needed
+      layer.bindPopup(popupContent, {
+        closeButton: false,
+      });
     },
-
+    style: {
+      fillColor: '#111d2f',
+      fillOpacity: 0.7,
+      color: '#33000c',
+      weight: 1,
+    }
+  }).addTo(map);
+  //Building Layer Button
+  var buttonControl = L.Control.extend({
+    options: {
+      position: 'topleft' 
+    },
     onAdd: function (map) {
       var button = L.DomUtil.create('button', 'leaflet-control-button-build');
       button.innerHTML = 'University Buildings';
@@ -448,9 +416,7 @@
       return button;
     }
   });
-
   map.addControl(new buttonControl());
-
   function toggleBuild() {
     if (map.hasLayer(buildLayer)) {
       map.removeLayer(buildLayer);
@@ -461,18 +427,18 @@
     }
   }
 
-    var cycleLayer = L.geoJSON(cycleJSON, {
-        style: {
-            color: 'red',
-            weight: 1
-        }
-    }).addTo(map);
-
-    var buttonControl = L.Control.extend({
+  //Cycle Layer
+  var cycleLayer = L.geoJSON(cycleJSON, {
+    style: {
+      color: 'red',
+      weight: 1
+    }
+  }).addTo(map);
+  //Button Cycle Layer
+  var buttonControl = L.Control.extend({
     options: {
-      position: 'topleft' // Adjust the position as needed
+      position: 'topleft' 
     },
-
     onAdd: function (map) {
       var button = L.DomUtil.create('button', 'leaflet-control-button-cycle');
       button.innerHTML = 'Cycle Lanes';
@@ -480,9 +446,7 @@
       return button;
     }
   });
-
   map.addControl(new buttonControl());
-
   function toggleCycle() {
     if (map.hasLayer(cycleLayer)) {
       map.removeLayer(cycleLayer);
@@ -493,19 +457,18 @@
     }
   }
   
-
-    var roadLayer = L.geoJSON(roadsJSON, {
-        style: {
-            color: '#fdfcc5',
-            weight: 2.5,
-        }
-    }).addTo(map)
-
-    var buttonControl = L.Control.extend({
+  //Road Layer
+  var roadLayer = L.geoJSON(roadsJSON, {
+    style: {
+        color: '#fdfcc5',
+        weight: 2.5,
+    }
+  }).addTo(map)
+  //Button Road Layer
+  var buttonControl = L.Control.extend({
     options: {
-      position: 'topleft' // Adjust the position as needed
+    position: 'topleft' 
     },
-
     onAdd: function (map) {
       var button = L.DomUtil.create('button', 'leaflet-control-button-roads');
       button.innerHTML = 'Roads and Paths';
@@ -513,9 +476,7 @@
       return button;
     }
   });
-
   map.addControl(new buttonControl());
-
   function toggleRoads() {
     if (map.hasLayer(roadLayer)) {
       map.removeLayer(roadLayer);
@@ -525,19 +486,18 @@
       document.querySelector('.leaflet-control-button-roads').classList.remove('off');
     }
   }
-
-    var accLayer = L.geoJSON(accesibleJSON, {
-        style: {
-            color: '#187dbf',
-            weight: 2,
-        }
-    }).addTo(map);
-
-    var buttonControl = L.Control.extend({
+  //Accesible Layer
+  var accLayer = L.geoJSON(accesibleJSON, {
+    style: {
+        color: '#187dbf',
+        weight: 2,
+    }
+  }).addTo(map);
+  //Accesible Layer Button
+  var buttonControl = L.Control.extend({
     options: {
-      position: 'topleft' // Adjust the position as needed
+      position: 'topleft'
     },
-
     onAdd: function (map) {
       var button = L.DomUtil.create('button', 'leaflet-control-button-wheelchair');
       button.innerHTML = 'Wheelchair accesible roads';
@@ -545,9 +505,7 @@
       return button;
     }
   });
-
   map.addControl(new buttonControl());
-
   function toggleAcc() {
     if (map.hasLayer(accLayer)) {
       map.removeLayer(accLayer);
@@ -558,33 +516,31 @@
     }
   }
 
+  //Legend
+  var legendControl = L.control({
+    position: 'bottomleft'
+  });
+  legendControl.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'info legend');
+    div.innerHTML += 'Legend';
+    div.onmouseover = function () {
+      div.innerHTML = 
+        '<i class="cycle-lane"></i> Cycle Lane<br>' +
+        '<i class="roads"></i> Roads and paths<br>' +
+        '<span><i class="Wheelchair"></i>Wheelchair Accesible Roads</span><br>' +
+        '<i class="building"></i>University Buildings<br>';
+    }
+    div.onmouseout = function () {
+      div.innerHTML = 'Legend';
+    }
+    return div;
+  };
+  legendControl.addTo(map);
 
-    var legendControl = L.control({
-        position: 'bottomleft'
-    });
-
-    legendControl.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'info legend');
-        div.innerHTML += 'Legend';
-        div.onmouseover = function () {
-            div.innerHTML = 
-            '<i class="cycle-lane"></i> Cycle Lane<br>' +
-            '<i class="roads"></i> Roads and paths<br>' +
-            '<span><i class="Wheelchair"></i>Wheelchair Accesible Roads</span><br>' +
-            '<i class="building"></i>University Buildings<br>';
-        }
-        div.onmouseout = function () {
-            div.innerHTML = 'Legend';
-        }
-        return div;
-    };
-
-    legendControl.addTo(map);
-
-    var textControl = L.control({
+  //Help Button
+  var textControl = L.control({
     position: 'topright'
   });
-
   textControl.onAdd = function (map) {
     var container = L.DomUtil.create('div', 'container');
     container.innerHTML += '<img src="help.png" width="50px" height="50px"">';
@@ -596,45 +552,37 @@
     };
     return container;
   };
-
   textControl.addTo(map);
 
-    L.control.scale({position: 'bottomright'}).addTo(map);
+  //Map limits
+  var southWest = L.latLng(57.163, -2.106),
+  northEast = L.latLng(57.168, -2.097),
+  bounds = L.latLngBounds(southWest, northEast);
+  map.setMaxBounds(bounds);
+  map.setMinZoom(14);
+  map.setMaxZoom(22);
+  map.options.easeLinearity = 0.25;
+  map.on('drag', function() {
+      map.panInsideBounds(bounds, { animate: false });
+  });
 
-var southWest = L.latLng(57.163, -2.106),
-northEast = L.latLng(57.168, -2.097),
-bounds = L.latLngBounds(southWest, northEast);
+  //Scales
+  L.control.scale({position: 'bottomright'}).addTo(map);
 
-map.setMaxBounds(bounds);
-
-map.setMinZoom(14);
-map.setMaxZoom(22);
-
-// Adjust easeLinearity to control the smoothness of panning
-map.options.easeLinearity = 0.25;
-
-map.on('drag', function() {
-    map.panInsideBounds(bounds, { animate: false });
-});
-
-var buttonControl = L.Control.extend({
+  //Fullscreen
+  var buttonControl = L.Control.extend({
     options: {
-      position: 'bottomright' // Adjust the position as needed
+      position: 'bottomright' 
     },
-
     onAdd: function (map) {
       var button = L.DomUtil.create('button', 'fullscreen-button');
       L.DomEvent.on(button, 'click', fullScreenView);
       return button;
     }
   });
-
   map.addControl(new buttonControl());
-
-var mapId = document.getElementById('map');
-function fullScreenView() {
-  mapId.requestFullscreen();
-}
-
-
+  var mapId = document.getElementById('map');
+  function fullScreenView() {
+    mapId.requestFullscreen();
+  }
 </script>
