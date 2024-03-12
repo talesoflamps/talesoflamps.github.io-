@@ -1,0 +1,240 @@
+##Import librairies
+import arcpy
+import os
+from arcpy.sa import *
+
+#download and sort the Data from Earth Data
+os.system('D:/Python_Script_Wood/wget/bin/wget.exe -P D:/Python_Script_Wood/Data/Terra --user "nicolasopez" --password "@FC3n$g@6Jk$Jd7X" -i D:/Python_Script_Wood/Data/Terra.txt')
+os.system('D:/GIS/Semester1/GG5569_Alegbra/Assesment_1/wget/bin/wget.exe -P D:/Python_Script_Wood/Data/Aqua --user "nicolasopez" --password "@FC3n$g@6Jk$Jd7X" -i D:/Python_Script_Wood/Data/Aqua.txt')
+print("Download completed")
+
+##Enlist the HDF files from the raw data folder for Terra
+arcpy.env.workspace ="D:/Python_Script_Wood/Data/Terra/"
+hdfList = arcpy.ListRasters()
+
+##Extract the day time temperature layers for Terra
+os.mkdir("D:/Python_Script_Wood/Data/Terra/Day/")
+rootPath = "D:/Python_Script_Wood/Data/Terra/"
+outputPath = "D:/Python_Script_Wood/Data/Terra/Day/"
+for filename in hdfList:
+    arcpy.ExtractSubDataset_management(in_raster=rootPath+filename, out_raster=outputPath+filename[8:-29]+".tif", subdataset_index="0")
+    
+##Extract the night time temperature layer for Terra
+arcpy.env.workspace ="D:/Python_Script_Wood/Data/Terra/"
+os.mkdir("D:/Python_Script_Wood/Data/Terra/Night/")
+rootPath = "D:/Python_Script_Wood/Data/Terra/"
+outputPath = "D:/Python_Script_Wood/Data/Terra/Night/"
+for filename in hdfList:
+    arcpy.ExtractSubDataset_management(in_raster=rootPath+filename, out_raster=outputPath+filename[8:-29]+".tif", subdataset_index="4")
+
+##Enlist the HDF files from the raw data folder for Aqua
+arcpy.env.workspace ="D:/Python_Script_Wood/Data/Aqua/"
+hdfList = arcpy.ListRasters()
+
+##Extract the day time temperature layer for Aqua
+os.mkdir("D:/Python_Script_Wood/Data/Aqua/Day/")
+rootPath = "D:/Python_Script_Wood/Data/Aqua/"
+outputPath = "D:/Python_Script_Wood/Data/Aqua/Day/"
+for filename in hdfList:
+    arcpy.ExtractSubDataset_management(in_raster=rootPath+filename, out_raster=outputPath+filename[8:-29]+".tif", subdataset_index="0")
+    
+##Extract the night time temperature layer for Aqua
+os.mkdir("D:/Python_Script_Wood/Data/Aqua/Night/")
+rootPath = "D:/Python_Script_Wood/Data/Aqua/"
+outputPath = "D:/Python_Script_Wood/Data/Aqua/Night/"
+for filename in hdfList:
+    arcpy.ExtractSubDataset_management(in_raster=rootPath+filename, out_raster=outputPath+filename[8:-29]+".tif", subdataset_index="4")
+
+##Create a mean of day time and night time raster files for Terra
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Day/"
+Terra/Day = arcpy.ListRasters("*", "TIF")
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Night/"
+Terra/Night = arcpy.ListRasters("*", "TIF")
+os.mkdir("D:/Python_Script_Wood/Data/Terra/Mean/")
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Mean/"
+for (i,j) in zip(Terra/Day,Terra/Night):
+    outCellStats = CellStatistics([f'D:/Python_Script_Wood/Data/Terra/Day/{i}', f'D:/Python_Script_Wood/Data/Terra/Night/{j}'], "MEAN", "NODATA")
+    outCellStats.save(f"D:/Python_Script_Wood/Data/Terra/Mean/{i}")
+
+##Create a mean of day time and night time raster files for Aqua
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Day/"
+Aqua/Day = arcpy.ListRasters("*", "TIF")
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Night/"
+Aqua/Night = arcpy.ListRasters("*", "TIF")
+os.mkdir("D:/Python_Script_Wood/Data/Aqua/Mean/")
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Mean/"
+for (i,j) in zip(Aqua/Day,Aqua/Night):
+    outCellStats = CellStatistics([f'D:/Python_Script_Wood/Data/Aqua/Day/{i}', f'D:/Python_Script_Wood/Data/Aqua/Night/{j}'], "MEAN", "NODATA")
+    outCellStats.save(f"D:/Python_Script_Wood/Data/Aqua/Mean/{i}")
+    
+##Create a mean of day time 
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Day/"
+Terra/Day = arcpy.ListRasters("*", "TIF")
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Day/"
+Aqua/Day = arcpy.ListRasters("*", "TIF")
+os.mkdir("D:/Python_Script_Wood/Data/Day/")
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Day/"
+for (i,j) in zip(Terra/Day,Aqua/Day):
+    outCellStats = CellStatistics([f'D:/Python_Script_Wood/Data/Terra/Day/{i}', f'D:/Python_Script_Wood/Data/Aqua/Day/{j}'], "MEAN", "NODATA")
+    outCellStats.save(f"D:/Python_Script_Wood/Data/Day/{i}")
+    
+##Create a mean of night time 
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Night/"
+Terra/Night = arcpy.ListRasters("*", "TIF")
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Night/"
+Aqua/Night = arcpy.ListRasters("*", "TIF")
+os.mkdir("D:/Python_Script_Wood/Data/Night/")
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Night/"
+for (i,j) in zip(Terra/Night,Aqua/Night):
+    outCellStats = CellStatistics([f'D:/Python_Script_Wood/Data/Terra/Night/{i}', f'D:/Python_Script_Wood/Data/Aqua/Night/{j}'], "MEAN", "NODATA")
+    outCellStats.save(f"D:/Python_Script_Wood/Data/Night/{i}")
+    
+##Apply the scale factor to convert the pixel values to celcius for Terra
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Mean/"
+rootPath = "D:/Python_Script_Wood/Data/Terra/Mean/"
+os.mkdir('D:/Python_Script_Wood/Data/Terra/Celcius/')
+outPath = ("D:/Python_Script_Wood/Data/Terra/Celcius/")
+rasterList = arcpy.ListRasters("*", "TIF")
+for filename in rasterList:
+    output_raster = (arcpy.sa.Raster(filename)*0.02)-273.15
+    output_raster.save(outPath+filename)
+
+##Apply the scale factor to convert the pixel values to celcius for Aqua
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Mean/"
+rootPath = "D:/Python_Script_Wood/Data/Aqua/Mean/"
+os.mkdir('D:/Python_Script_Wood/Data/Aqua/Celcius/')
+outPath = ("D:/Python_Script_Wood/Data/Aqua/Celcius/")
+rasterList = arcpy.ListRasters("*", "TIF")
+for filename in rasterList:
+    output_raster = (arcpy.sa.Raster(filename)*0.02)-273.15
+    output_raster.save(outPath+filename)
+    
+#Convert Day time  to celcius    
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Day/"
+rootPath = "D:/Python_Script_Wood/Data/Day/"
+os.mkdir('D:/Python_Script_Wood/Data/Day/Celcius/')
+outPath = ("D:/Python_Script_Wood/Data/Day/Celcius/")
+rasterList = arcpy.ListRasters("*", "TIF")
+for filename in rasterList:
+    output_raster = (arcpy.sa.Raster(filename)*0.02)-273.15
+    output_raster.save(outPath+filename)
+
+#Convert Night time  to celcius     
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Night/"
+rootPath = "D:/Python_Script_Wood/Data/Night/"
+os.mkdir('D:/Python_Script_Wood/Data/Night/Celcius/')
+outPath = ("D:/Python_Script_Wood/Data/Night/Celcius/")
+rasterList = arcpy.ListRasters("*", "TIF")
+for filename in rasterList:
+    output_raster = (arcpy.sa.Raster(filename)*0.02)-273.15
+    output_raster.save(outPath+filename)
+    
+##Create a new raster with pixelwise stdv for Aqua mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "STD", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Aqua/Celcius/STD.tif")
+
+##Create a new raster with pixelwise stdv for Terra mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "STD", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Terra/Celcius/STD.tif")
+
+##Create a new raster with maximum for Aqua mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MAXIMUM", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Aqua/Celcius/Aqua_MAX.tif")
+
+##Create a new raster with maximum for Terra mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MAXIMUM", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Terra/Celcius/Terra_MAX.tif")
+
+##Create a new raster with minimum for Aqua mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MINIMUM", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Aqua/Celcius/Aqua_min.tif")
+
+##Create a new raster with minimum for Terra mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MINIMUM", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Terra/Celcius/Terra_min.tif")
+
+##Create a new raster with annual mean for Aqua mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MEAN", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Aqua/Celcius/Aqua/Mean.tif")
+
+##Create a new raster with annual mean for Terra mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MEAN", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Terra/Celcius/Terra/Mean.tif")
+
+##Create a new raster with median for Aqua mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MEDIAN", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Aqua/Celcius/Aqua_median.tif")
+
+##Create a new raster with median for Terra mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MEDIAN", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Terra/Celcius/Terra_median.tif")
+
+##Create a new raster with percentile for Aqua mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Aqua/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "PERCENTILE", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Aqua/Celcius/Aqua_percentile.tif")
+
+##Create a new raster with percentile for Terra mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Terra/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "PERCENTILE", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Terra/Celcius/Terra_PERCENTILE.tif")
+
+##Create a new raster with pixelwise stdv for Night mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Night/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "STD", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Night/Celcius/Night_STD.tif")
+
+##Create a new raster with maximum for Night mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Night/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MAXIMUM", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Night/Celcius/Night_MAX.tif")
+
+##Create a new raster with minimum for Night mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Night/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MINIMUM", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Night/Celcius/Night_min.tif")
+
+##Create a new raster with annual mean for Night mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Night/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MEAN", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Night/Celcius/Night/Mean.tif")
+
+##Create a new raster with median for Night mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Night/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "MEDIAN", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Night/Celcius/Night_median.tif")
+
+##Create a new raster with percentile for Night mean
+arcpy.env.workspace = "D:/Python_Script_Wood/Data/Night/Celcius/"
+Kel_rasterList = arcpy.ListRasters("*", "TIF")
+Outcellstats = CellStatistics(Kel_rasterList, "PERCENTILE", "DATA")
+Outcellstats.save("D:/Python_Script_Wood/Data/Night/Celcius/Night_percentile.tif")
+
+print("Completed")
